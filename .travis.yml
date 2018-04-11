@@ -1,0 +1,27 @@
+sudo: required
+
+services:
+- docker
+
+language: python
+
+python:
+  - "2.7"
+
+script: /bin/true
+
+after_success:
+- docker --version
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
+- export REPO_CLIENT=$DOCKER_ORGANISATION/cassh
+- export REPO_SERVER=$DOCKER_ORGANISATION/cassh-server
+- export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH; fi`
+- echo "--> Build server"
+- docker build -f ./docker/docker-client/Dockerfile -t $REPO_SERVER:$TAG .
+- echo "--> Build client"
+- docker build -f ./docker/docker-server/Dockerfile -t $REPO_CLIENT:$COMMIT .
+
+- echo "--> Publish server"
+- docker push $REPO_SERVER:$TAG
+- echo "--> Publish client"
+- docker push $REPO_CLIENT:$TAG
