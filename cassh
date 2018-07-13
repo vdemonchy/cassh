@@ -117,7 +117,7 @@ class CASSH(object):
         """
         passwd_message = 'Please type your LDAP password (user=%s): ' % self.realname
         if self.auth == 'ldap':
-            auth = {'realname': self.realname, 'password': getpass(passwd_message)}
+            auth = {'realname': self.realname, 'password': getpass(passwd_message).encode('utf-8')}
             if prefix is not None:
                 auth.update(prefix)
             return '?%s' % urlencode(auth)
